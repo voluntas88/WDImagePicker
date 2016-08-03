@@ -18,13 +18,15 @@ import UIKit
     public var cropSize = CGSizeMake(320, 320)
     public var resizableCropArea = false
     public var imagePickerController = UIImagePickerController()
+    private var strings:(title:String, use:String, cancel:String, hint:String)?
     public static var toolbarHeight:CGFloat {
         return CGFloat(44.0)
     }
-    public init(sourceType: UIImagePickerControllerSourceType) {
+    public init(sourceType: UIImagePickerControllerSourceType, strings:(title:String, use:String, cancel:String, hint:String)?) {
         super.init()
         imagePickerController.delegate = self
         imagePickerController.sourceType = sourceType
+        self.strings = strings
     }
 
     private func hideController() {
@@ -46,7 +48,7 @@ import UIKit
                                resizableCropArea: resizableCropArea,
                                cropSize: cropSize,
                                delegate: self,
-                               strings: nil)
+                               strings: strings)
             picker.pushViewController(cropController, animated: true)
         }
         
