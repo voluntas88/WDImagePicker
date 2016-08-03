@@ -10,18 +10,18 @@ import UIKit
 
 internal class WDCropBorderView: UIView {
     private let kNumberOfBorderHandles: CGFloat = 8
-    private let kHandleDiameter: CGFloat = 24
+    private let kHandleDiameter: CGFloat = 18
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        self.backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clearColor()
     }
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
 
-        self.backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clearColor()
     }
 
     override func drawRect(rect: CGRect) {
@@ -42,8 +42,8 @@ internal class WDCropBorderView: UIView {
 
     private func calculateAllNeededHandleRects() -> [CGRect] {
 
-        let width = self.frame.width
-        let height = self.frame.height
+        let width = frame.width
+        let height = frame.height
 
         let leftColX: CGFloat = 0
         let rightColX = width - kHandleDiameter

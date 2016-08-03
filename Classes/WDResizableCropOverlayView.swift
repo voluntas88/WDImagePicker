@@ -33,20 +33,19 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         }
         set {
             super.frame = newValue
-
-            let toolbarSize = CGFloat(UIDevice.currentDevice().userInterfaceIdiom == .Pad ? 0 : 54)
-            let width = self.bounds.size.width
-            let height = self.bounds.size.height
+            
+            let width = bounds.size.width
+            let height = bounds.size.height
 
             contentView?.frame = CGRectMake((
                 width - initialContentSize.width) / 2,
-                (height - toolbarSize - initialContentSize.height) / 2,
+                (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2,
                 initialContentSize.width,
                 initialContentSize.height)
 
             cropBorderView?.frame = CGRectMake(
                 (width - initialContentSize.width) / 2 - kBorderCorrectionValue,
-                (height - toolbarSize - initialContentSize.height) / 2 - kBorderCorrectionValue,
+                (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2 - kBorderCorrectionValue,
                 initialContentSize.width + kBorderCorrectionValue * 2,
                 initialContentSize.height + kBorderCorrectionValue * 2)
         }
@@ -56,7 +55,7 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         super.init(frame: frame)
 
         self.initialContentSize = initialContentSize
-        self.addContentViews()
+        addContentViews()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -71,17 +70,17 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         if let touch = touches.first {
             let touchPoint = touch.locationInView(cropBorderView)
 
-            anchor = self.calculateAnchorBorder(touchPoint)
+            anchor = calculateAnchorBorder(touchPoint)
             fillMultiplyer()
             resizingEnabled = true
-            startPoint = touch.locationInView(self.superview)
+            startPoint = touch.locationInView(superview)
         }
     }
 
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if let touch = touches.first {
-            if resizingEnabled! {
-                self.resizeWithTouchPoint(touch.locationInView(self.superview))
+            if (resizingEnabled != nil) {
+                resizeWithTouchPoint(touch.locationInView(superview))
             }
         }
     }
@@ -89,33 +88,32 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
     override func drawRect(rect: CGRect) {
         //fill outer rect
         UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).set()
-        UIRectFill(self.bounds)
+        UIRectFill(bounds)
 
         //fill inner rect
         UIColor.clearColor().set()
-        UIRectFill(self.contentView.frame)
+        UIRectFill(contentView.frame)
     }
 
     private func addContentViews() {
-        let toolbarSize = CGFloat(UIDevice.currentDevice().userInterfaceIdiom == .Pad ? 0 : 54)
-        let width = self.bounds.size.width
-        let height = self.bounds.size.height
+        let width = bounds.size.width
+        let height = bounds.size.height
 
         contentView = UIView(frame: CGRectMake((
             width - initialContentSize.width) / 2,
-            (height - toolbarSize - initialContentSize.height) / 2,
+            (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2,
             initialContentSize.width,
             initialContentSize.height))
         contentView.backgroundColor = UIColor.clearColor()
-        self.cropSize = contentView.frame.size
-        self.addSubview(contentView)
+        cropSize = contentView.frame.size
+        addSubview(contentView)
 
         cropBorderView = WDCropBorderView(frame: CGRectMake(
             (width - initialContentSize.width) / 2 - kBorderCorrectionValue,
-            (height - toolbarSize - initialContentSize.height) / 2 - kBorderCorrectionValue,
+            (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2 - kBorderCorrectionValue,
             initialContentSize.width + kBorderCorrectionValue * 2,
             initialContentSize.height + kBorderCorrectionValue * 2))
-        self.addSubview(cropBorderView)
+        addSubview(cropBorderView)
     }
 
     private func calculateAnchorBorder(anchorPoint: CGPoint) -> CGPoint {
@@ -165,10 +163,10 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         let border = kBorderCorrectionValue * 2
         var pointX = point.x < border ? border : point.x
         var pointY = point.y < border ? border : point.y
-        pointX = pointX > self.superview!.bounds.size.width - border ?
-            self.superview!.bounds.size.width - border : pointX
-        pointY = pointY > self.superview!.bounds.size.height - border ?
-            self.superview!.bounds.size.height - border : pointY
+        pointX = pointX > superview!.bounds.size.width - border ?
+            superview!.bounds.size.width - border : pointX
+        pointY = pointY > superview!.bounds.size.height - border ?
+            superview!.bounds.size.height - border : pointY
 
         let heightChange = (pointY - startPoint.y) * resizeMultiplyer.heightMultiplyer
         let widthChange = (startPoint.x - pointX) * resizeMultiplyer.widthMultiplyer
@@ -180,14 +178,14 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
             cropBorderView.frame.origin.y + yChange,
             cropBorderView.frame.size.width + widthChange,
             cropBorderView.frame.size.height + heightChange);
-        newFrame = self.preventBorderFrameFromGettingTooSmallOrTooBig(newFrame)
-        self.resetFrame(to: newFrame)
+        newFrame = preventBorderFrameFromGettingTooSmallOrTooBig(newFrame)
+        resetFrame(to: newFrame)
         startPoint = CGPointMake(pointX, pointY)
     }
 
-    private func preventBorderFrameFromGettingTooSmallOrTooBig(frame: CGRect) -> CGRect {
-        let toolbarSize = CGFloat(UIDevice.currentDevice().userInterfaceIdiom == .Pad ? 0 : 54)
-        var newFrame = frame
+    private func preventBorderFrameFromGettingTooSmallOrTooBig(frameRect: CGRect) -> CGRect {
+        let toolbarSize = WDImagePicker.toolbarHeight
+        var newFrame = frameRect
 
         if newFrame.size.width < 64 {
             newFrame.size.width = cropBorderView.frame.size.width
@@ -200,22 +198,22 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
 
         if newFrame.origin.x < 0 {
             newFrame.size.width = cropBorderView.frame.size.width +
-                (cropBorderView.frame.origin.x - self.superview!.bounds.origin.x)
+                (cropBorderView.frame.origin.x - superview!.bounds.origin.x)
             newFrame.origin.x = 0
         }
 
         if newFrame.origin.y < 0 {
             newFrame.size.height = cropBorderView.frame.size.height +
-                (cropBorderView.frame.origin.y - self.superview!.bounds.origin.y)
+                (cropBorderView.frame.origin.y - superview!.bounds.origin.y)
             newFrame.origin.y = 0
         }
 
-        if newFrame.size.width + newFrame.origin.x > self.frame.size.width {
-            newFrame.size.width = self.frame.size.width - cropBorderView.frame.origin.x
+        if newFrame.size.width + newFrame.origin.x > frame.size.width {
+            newFrame.size.width = frame.size.width - cropBorderView.frame.origin.x
         }
 
-        if newFrame.size.height + newFrame.origin.y > self.frame.size.height - toolbarSize {
-            newFrame.size.height = self.frame.size.height -
+        if newFrame.size.height + newFrame.origin.y > frame.size.height - toolbarSize {
+            newFrame.size.height = frame.size.height -
                 cropBorderView.frame.origin.y - toolbarSize
         }
 
@@ -226,7 +224,7 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         cropBorderView.frame = frame
         contentView.frame = CGRectInset(frame, kBorderCorrectionValue, kBorderCorrectionValue)
         cropSize = contentView.frame.size
-        self.setNeedsDisplay()
+        setNeedsDisplay()
         cropBorderView.setNeedsDisplay()
     }
 

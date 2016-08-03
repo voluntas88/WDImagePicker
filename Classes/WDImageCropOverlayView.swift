@@ -11,43 +11,39 @@ import UIKit
 internal class WDImageCropOverlayView: UIView {
 
     var cropSize: CGSize!
-    var toolbar: UIToolbar!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        self.backgroundColor = UIColor.clearColor()
-        self.userInteractionEnabled = true
+        backgroundColor = UIColor.clearColor()
+        userInteractionEnabled = true
     }
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
 
-        self.backgroundColor = UIColor.clearColor()
-        self.userInteractionEnabled = true
+        backgroundColor = UIColor.clearColor()
+        userInteractionEnabled = true
     }
 
     override func drawRect(rect: CGRect) {
+        let width = CGRectGetWidth(frame)
+        let height = CGRectGetHeight(frame) - WDImagePicker.toolbarHeight
 
-        let toolbarSize = CGFloat(UIDevice.currentDevice().userInterfaceIdiom == .Pad ? 0 : 54)
-
-        let width = CGRectGetWidth(self.frame)
-        let height = CGRectGetHeight(self.frame) - toolbarSize
-
-        let heightSpan = floor(height / 2 - self.cropSize.height / 2)
-        let widthSpan = floor(width / 2 - self.cropSize.width / 2)
+        let heightSpan = floor(height / 2 - cropSize.height / 2)
+        let widthSpan = floor(width / 2 - cropSize.width / 2)
 
         // fill outer rect
         UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).set()
-        UIRectFill(self.bounds)
+        UIRectFill(bounds)
 
         // fill inner border
         UIColor(red: 1, green: 1, blue: 1, alpha: 0.5).set()
-        UIRectFrame(CGRectMake(widthSpan - 2, heightSpan - 2, self.cropSize.width + 4,
-            self.cropSize.height + 4))
+        UIRectFrame(CGRectMake(widthSpan - 2, heightSpan - 2, cropSize.width + 4,
+            cropSize.height + 4))
 
         // fill inner rect
         UIColor.clearColor().set()
-        UIRectFill(CGRectMake(widthSpan, heightSpan, self.cropSize.width, self.cropSize.height))
+        UIRectFill(CGRectMake(widthSpan, heightSpan, cropSize.width, cropSize.height))
     }
 }

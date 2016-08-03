@@ -9,52 +9,50 @@
 import UIKit
 
 @objc public protocol WDImagePickerDelegate {
-    optional func imagePicker(imagePicker: WDImagePicker, pickedImage: UIImage)
+    optional func imagePicker(imagePicker: WDImagePicker, pickedImage: UIImage?)
     optional func imagePickerDidCancel(imagePicker: WDImagePicker)
 }
 
 @objc public class WDImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate, WDImageCropControllerDelegate {
     public var delegate: WDImagePickerDelegate?
-    public var cropSize: CGSize!
+    public var cropSize = CGSizeMake(320, 320)
     public var resizableCropArea = false
-
-    private var _imagePickerController: UIImagePickerController!
-
-    public var imagePickerController: UIImagePickerController {
-        return _imagePickerController
+    public var imagePickerController = UIImagePickerController()
+    public static var toolbarHeight:CGFloat {
+        return CGFloat(44.0)
     }
-    
-    override public init() {
+    public init(sourceType: UIImagePickerControllerSourceType) {
         super.init()
-
-        self.cropSize = CGSizeMake(320, 320)
-        _imagePickerController = UIImagePickerController()
-        _imagePickerController.delegate = self
-        _imagePickerController.sourceType = .PhotoLibrary
+        imagePickerController.delegate = self
+        imagePickerController.sourceType = sourceType
     }
 
     private func hideController() {
-        self._imagePickerController.dismissViewControllerAnimated(true, completion: nil)
+        imagePickerController.dismissViewControllerAnimated(true, completion: nil)
     }
 
     public func imagePickerControllerDidCancel(picker: UIImagePickerController) {
         if self.delegate?.imagePickerDidCancel != nil {
-            self.delegate?.imagePickerDidCancel!(self)
+            self.delegate?.imagePickerDidCancel?(self)
         } else {
             self.hideController()
         }
     }
 
     public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-        let cropController = WDImageCropViewController()
-        cropController.sourceImage = info[UIImagePickerControllerOriginalImage] as! UIImage
-        cropController.resizableCropArea = self.resizableCropArea
-        cropController.cropSize = self.cropSize
-        cropController.delegate = self
-        picker.pushViewController(cropController, animated: true)
+        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            let cropController = WDImageCropViewController()
+            cropController.set(image,
+                               resizableCropArea: resizableCropArea,
+                               cropSize: cropSize,
+                               delegate: self,
+                               strings: nil)
+            picker.pushViewController(cropController, animated: true)
+        }
+        
     }
 
-    func imageCropController(imageCropController: WDImageCropViewController, didFinishWithCroppedImage croppedImage: UIImage) {
+    func imageCropController(imageCropController: WDImageCropViewController, didFinishWithCroppedImage croppedImage: UIImage?) {
         self.delegate?.imagePicker?(self, pickedImage: croppedImage)
     }
 }
