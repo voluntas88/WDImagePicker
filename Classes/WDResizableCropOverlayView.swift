@@ -16,16 +16,16 @@ private struct WDResizableViewBorderMultiplyer {
 }
 
 internal class WDResizableCropOverlayView: WDImageCropOverlayView {
-    private let kBorderCorrectionValue: CGFloat = 12
+    fileprivate let kBorderCorrectionValue: CGFloat = 12
 
     var contentView: UIView!
     var cropBorderView: WDCropBorderView!
 
-    private var initialContentSize = CGSize(width: 0, height: 0)
-    private var resizingEnabled: Bool!
-    private var anchor: CGPoint!
-    private var startPoint: CGPoint!
-    private var resizeMultiplyer = WDResizableViewBorderMultiplyer()
+    fileprivate var initialContentSize = CGSize(width: 0, height: 0)
+    fileprivate var resizingEnabled: Bool!
+    fileprivate var anchor: CGPoint!
+    fileprivate var startPoint: CGPoint!
+    fileprivate var resizeMultiplyer = WDResizableViewBorderMultiplyer()
 
     override var frame: CGRect {
         get {
@@ -37,17 +37,17 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
             let width = bounds.size.width
             let height = bounds.size.height
 
-            contentView?.frame = CGRectMake((
+            contentView?.frame = CGRect(x: (
                 width - initialContentSize.width) / 2,
-                (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2,
-                initialContentSize.width,
-                initialContentSize.height)
+                y: (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2,
+                width: initialContentSize.width,
+                height: initialContentSize.height)
 
-            cropBorderView?.frame = CGRectMake(
-                (width - initialContentSize.width) / 2 - kBorderCorrectionValue,
-                (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2 - kBorderCorrectionValue,
-                initialContentSize.width + kBorderCorrectionValue * 2,
-                initialContentSize.height + kBorderCorrectionValue * 2)
+            cropBorderView?.frame = CGRect(
+                x: (width - initialContentSize.width) / 2 - kBorderCorrectionValue,
+                y: (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2 - kBorderCorrectionValue,
+                width: initialContentSize.width + kBorderCorrectionValue * 2,
+                height: initialContentSize.height + kBorderCorrectionValue * 2)
         }
     }
 
@@ -66,57 +66,57 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         super.init(frame: frame)
     }
 
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first {
-            let touchPoint = touch.locationInView(cropBorderView)
+            let touchPoint = touch.location(in: cropBorderView)
 
             anchor = calculateAnchorBorder(touchPoint)
             fillMultiplyer()
             resizingEnabled = true
-            startPoint = touch.locationInView(superview)
+            startPoint = touch.location(in: superview)
         }
     }
 
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first {
             if (resizingEnabled != nil) {
-                resizeWithTouchPoint(touch.locationInView(superview))
+                resizeWithTouchPoint(touch.location(in: superview))
             }
         }
     }
 
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         //fill outer rect
         UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).set()
         UIRectFill(bounds)
 
         //fill inner rect
-        UIColor.clearColor().set()
+        UIColor.clear.set()
         UIRectFill(contentView.frame)
     }
 
-    private func addContentViews() {
+    fileprivate func addContentViews() {
         let width = bounds.size.width
         let height = bounds.size.height
 
-        contentView = UIView(frame: CGRectMake((
+        contentView = UIView(frame: CGRect(x: (
             width - initialContentSize.width) / 2,
-            (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2,
-            initialContentSize.width,
-            initialContentSize.height))
-        contentView.backgroundColor = UIColor.clearColor()
+            y: (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2,
+            width: initialContentSize.width,
+            height: initialContentSize.height))
+        contentView.backgroundColor = UIColor.clear
         cropSize = contentView.frame.size
         addSubview(contentView)
 
-        cropBorderView = WDCropBorderView(frame: CGRectMake(
-            (width - initialContentSize.width) / 2 - kBorderCorrectionValue,
-            (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2 - kBorderCorrectionValue,
-            initialContentSize.width + kBorderCorrectionValue * 2,
-            initialContentSize.height + kBorderCorrectionValue * 2))
+        cropBorderView = WDCropBorderView(frame: CGRect(
+            x: (width - initialContentSize.width) / 2 - kBorderCorrectionValue,
+            y: (height - WDImagePicker.toolbarHeight - initialContentSize.height) / 2 - kBorderCorrectionValue,
+            width: initialContentSize.width + kBorderCorrectionValue * 2,
+            height: initialContentSize.height + kBorderCorrectionValue * 2))
         addSubview(cropBorderView)
     }
 
-    private func calculateAnchorBorder(anchorPoint: CGPoint) -> CGPoint {
+    fileprivate func calculateAnchorBorder(_ anchorPoint: CGPoint) -> CGPoint {
         let allHandles = getAllCurrentHandlePositions()
         var closest: CGFloat = 3000
         var anchor: CGPoint!
@@ -134,7 +134,7 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         return anchor
     }
 
-    private func getAllCurrentHandlePositions() -> [CGPoint] {
+    fileprivate func getAllCurrentHandlePositions() -> [CGPoint] {
         let leftX: CGFloat = 0
         let rightX = cropBorderView.bounds.size.width
         let centerX = leftX + (rightX - leftX) / 2
@@ -144,20 +144,20 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         let middleY = topY + (bottomY - topY) / 2
 
         // starting with the upper left corner and then following the rect clockwise
-        let topLeft = CGPointMake(leftX, topY)
-        let topCenter = CGPointMake(centerX, topY)
-        let topRight = CGPointMake(rightX, topY)
-        let middleRight = CGPointMake(rightX, middleY)
-        let bottomRight = CGPointMake(rightX, bottomY)
-        let bottomCenter = CGPointMake(centerX, bottomY)
-        let bottomLeft = CGPointMake(leftX, bottomY)
-        let middleLeft = CGPointMake(leftX, middleY)
+        let topLeft = CGPoint(x: leftX, y: topY)
+        let topCenter = CGPoint(x: centerX, y: topY)
+        let topRight = CGPoint(x: rightX, y: topY)
+        let middleRight = CGPoint(x: rightX, y: middleY)
+        let bottomRight = CGPoint(x: rightX, y: bottomY)
+        let bottomCenter = CGPoint(x: centerX, y: bottomY)
+        let bottomLeft = CGPoint(x: leftX, y: bottomY)
+        let middleLeft = CGPoint(x: leftX, y: middleY)
 
         return [topLeft, topCenter, topRight, middleRight, bottomRight, bottomCenter, bottomLeft,
             middleLeft]
     }
 
-    private func resizeWithTouchPoint(point: CGPoint) {
+    fileprivate func resizeWithTouchPoint(_ point: CGPoint) {
         // This is the place where all the magic happends
         // prevent goint offscreen...
         let border = kBorderCorrectionValue * 2
@@ -173,17 +173,17 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         let xChange = -1 * widthChange * resizeMultiplyer.xMultiplyer
         let yChange = -1 * heightChange * resizeMultiplyer.yMultiplyer
 
-        var newFrame =  CGRectMake(
-            cropBorderView.frame.origin.x + xChange,
-            cropBorderView.frame.origin.y + yChange,
-            cropBorderView.frame.size.width + widthChange,
-            cropBorderView.frame.size.height + heightChange);
+        var newFrame =  CGRect(
+            x: cropBorderView.frame.origin.x + xChange,
+            y: cropBorderView.frame.origin.y + yChange,
+            width: cropBorderView.frame.size.width + widthChange,
+            height: cropBorderView.frame.size.height + heightChange);
         newFrame = preventBorderFrameFromGettingTooSmallOrTooBig(newFrame)
         resetFrame(to: newFrame)
-        startPoint = CGPointMake(pointX, pointY)
+        startPoint = CGPoint(x: pointX, y: pointY)
     }
 
-    private func preventBorderFrameFromGettingTooSmallOrTooBig(frameRect: CGRect) -> CGRect {
+    fileprivate func preventBorderFrameFromGettingTooSmallOrTooBig(_ frameRect: CGRect) -> CGRect {
         let toolbarSize = WDImagePicker.toolbarHeight
         var newFrame = frameRect
 
@@ -220,15 +220,15 @@ internal class WDResizableCropOverlayView: WDImageCropOverlayView {
         return newFrame
     }
 
-    private func resetFrame(to frame: CGRect) {
+    fileprivate func resetFrame(to frame: CGRect) {
         cropBorderView.frame = frame
-        contentView.frame = CGRectInset(frame, kBorderCorrectionValue, kBorderCorrectionValue)
+        contentView.frame = frame.insetBy(dx: kBorderCorrectionValue, dy: kBorderCorrectionValue)
         cropSize = contentView.frame.size
         setNeedsDisplay()
         cropBorderView.setNeedsDisplay()
     }
 
-    private func fillMultiplyer() {
+    fileprivate func fillMultiplyer() {
         // -1 left, 0 middle, 1 right
         resizeMultiplyer.heightMultiplyer = anchor.y == 0 ?
             -1 : anchor.y == cropBorderView.bounds.size.height ? 1 : 0
