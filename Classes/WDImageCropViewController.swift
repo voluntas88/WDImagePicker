@@ -10,22 +10,22 @@ import UIKit
 import CoreGraphics
 
 internal protocol WDImageCropControllerDelegate {
-    func imageCropController(imageCropController: WDImageCropViewController, didFinishWithCroppedImage croppedImage: UIImage?)
+    func imageCropController(_ imageCropController: WDImageCropViewController, didFinishWithCroppedImage croppedImage: UIImage?)
 }
 
 internal class WDImageCropViewController: UIViewController {
-    private var sourceImage: UIImage!
-    private var delegate: WDImageCropControllerDelegate?
-    private var cropSize: CGSize!
-    private var resizableCropArea = false
+    fileprivate var sourceImage: UIImage!
+    fileprivate var delegate: WDImageCropControllerDelegate?
+    fileprivate var cropSize: CGSize!
+    fileprivate var resizableCropArea = false
 
-    private var croppedImage: UIImage?
+    fileprivate var croppedImage: UIImage?
 
-    private var imageCropView: WDImageCropView!
-    private var toolbar: UIToolbar = UIToolbar(frame: CGRectZero)
-    private var strings = (title:"Choose Photo", use:"Use", cancel:"Cancel", hint:"")
+    fileprivate var imageCropView: WDImageCropView!
+    fileprivate var toolbar: UIToolbar = UIToolbar(frame: CGRect.zero)
+    fileprivate var strings = (title:"Choose Photo", use:"Use", cancel:"Cancel", hint:"")
 
-    func set(sourceImage:UIImage!, resizableCropArea:Bool, cropSize:CGSize, delegate:WDImageCropControllerDelegate, strings:(title:String, use:String, cancel:String, hint:String)?) {
+    func set(_ sourceImage:UIImage!, resizableCropArea:Bool, cropSize:CGSize, delegate:WDImageCropControllerDelegate, strings:(title:String, use:String, cancel:String, hint:String)?) {
         self.sourceImage = sourceImage
         self.resizableCropArea = resizableCropArea
         self.cropSize = cropSize
@@ -46,30 +46,30 @@ internal class WDImageCropViewController: UIViewController {
         setupCropView()
         setupToolbar()
 
-        navigationController?.navigationBarHidden = true
+        navigationController?.isNavigationBarHidden = true
     }
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
         imageCropView.frame = view.bounds
-        toolbar.frame = CGRectMake(0, CGRectGetHeight(view.frame) - WDImagePicker.toolbarHeight, view.frame.size.width, WDImagePicker.toolbarHeight)
+        toolbar.frame = CGRect(x: 0, y: view.frame.height - WDImagePicker.toolbarHeight, width: view.frame.size.width, height: WDImagePicker.toolbarHeight)
     }
 
-    func actionCancel(sender: AnyObject) {
-        navigationController?.popViewControllerAnimated(true)
+    func actionCancel(_ sender: AnyObject) {
+        navigationController?.popViewController(animated: true)
     }
 
-    func actionUse(sender: AnyObject) {
+    func actionUse(_ sender: AnyObject) {
         delegate?.imageCropController(self, didFinishWithCroppedImage: imageCropView.croppedImage())
     }
 
-    private func setupNavigationBar() {
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: #selector(actionCancel))
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: strings.use, style: .Plain, target: self, action: #selector(actionUse))
+    fileprivate func setupNavigationBar() {
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(actionCancel))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: strings.use, style: .plain, target: self, action: #selector(actionUse))
     }
 
-    private func setupCropView() {
+    fileprivate func setupCropView() {
         imageCropView = WDImageCropView(frame: view.bounds,
                                         resizableCropArea: resizableCropArea,
                                         imageToCrop: sourceImage,
@@ -77,37 +77,37 @@ internal class WDImageCropViewController: UIViewController {
         view.addSubview(imageCropView)
     }
 
-    private func toolbarBackgroundImage() -> UIImage {
+    fileprivate func toolbarBackgroundImage() -> UIImage {
         let components: [CGFloat] = [1, 1, 1, 1, 123.0 / 255.0, 125.0 / 255.0, 132.0 / 255.0, 1]
 
-        UIGraphicsBeginImageContextWithOptions(CGSizeMake(320, WDImagePicker.toolbarHeight), true, 0)
+        UIGraphicsBeginImageContextWithOptions(CGSize(width: 320, height: WDImagePicker.toolbarHeight), true, 0)
 
         let context = UIGraphicsGetCurrentContext()
         let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let gradient = CGGradientCreateWithColorComponents(colorSpace, components, nil, 2)
+        let gradient = CGGradient(colorSpace: colorSpace, colorComponents: components, locations: nil, count: 2)
 
-        CGContextDrawLinearGradient(context, gradient, CGPointMake(0, 0), CGPointMake(0, WDImagePicker.toolbarHeight), [])
+        context?.drawLinearGradient(gradient!, start: CGPoint(x: 0, y: 0), end: CGPoint(x: 0, y: WDImagePicker.toolbarHeight), options: [])
 
         let viewImage = UIGraphicsGetImageFromCurrentImageContext()
 
         UIGraphicsEndImageContext()
 
-        return viewImage
+        return viewImage!
     }
 
-    private func setupToolbar() {
-        toolbar.barStyle = .Black
-        toolbar.tintColor = UIColor.whiteColor()
+    fileprivate func setupToolbar() {
+        toolbar.barStyle = .black
+        toolbar.tintColor = UIColor.white
         view.addSubview(toolbar)
 
-        let info = UILabel(frame: CGRectZero)
+        let info = UILabel(frame: CGRect.zero)
         info.text = strings.hint
-        info.textColor = UIColor.whiteColor()
+        info.textColor = UIColor.white
         info.sizeToFit()
 
-        let cancel = UIBarButtonItem(title: strings.cancel, style: .Plain, target: self, action: #selector(actionCancel))
-        let use = UIBarButtonItem(title: strings.use, style: .Plain, target: self, action: #selector(actionUse))
-        let flex = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: nil)
+        let cancel = UIBarButtonItem(title: strings.cancel, style: .plain, target: self, action: #selector(actionCancel))
+        let use = UIBarButtonItem(title: strings.use, style: .plain, target: self, action: #selector(actionUse))
+        let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let label = UIBarButtonItem(customView: info)
         
         toolbar.setItems([cancel, flex, label, flex, use], animated: false)

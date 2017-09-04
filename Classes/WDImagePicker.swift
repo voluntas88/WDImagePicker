@@ -9,17 +9,17 @@
 import UIKit
 
 @objc public protocol WDImagePickerDelegate {
-    optional func imagePicker(imagePicker: WDImagePicker, pickedImage: UIImage?)
-    optional func imagePickerDidCancel(imagePicker: WDImagePicker)
+    @objc optional func imagePicker(_ imagePicker: WDImagePicker, pickedImage: UIImage?)
+    @objc optional func imagePickerDidCancel(_ imagePicker: WDImagePicker)
 }
 
-@objc public class WDImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate, WDImageCropControllerDelegate {
-    public var delegate: WDImagePickerDelegate?
-    public var cropSize = CGSizeMake(320, 320)
-    public var resizableCropArea = false
-    public var imagePickerController = UIImagePickerController()
-    private var strings:(title:String, use:String, cancel:String, hint:String)?
-    public static var toolbarHeight:CGFloat {
+@objc open class WDImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate, WDImageCropControllerDelegate {
+    open var delegate: WDImagePickerDelegate?
+    open var cropSize = CGSize(width: 320, height: 320)
+    open var resizableCropArea = false
+    open var imagePickerController = UIImagePickerController()
+    fileprivate var strings:(title:String, use:String, cancel:String, hint:String)?
+    open static var toolbarHeight:CGFloat {
         return CGFloat(44.0)
     }
     public init(sourceType: UIImagePickerControllerSourceType, strings:(title:String, use:String, cancel:String, hint:String)?) {
@@ -29,11 +29,11 @@ import UIKit
         self.strings = strings
     }
 
-    private func hideController() {
-        imagePickerController.dismissViewControllerAnimated(true, completion: nil)
+    fileprivate func hideController() {
+        imagePickerController.dismiss(animated: true, completion: nil)
     }
 
-    public func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+    open func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         if self.delegate?.imagePickerDidCancel != nil {
             self.delegate?.imagePickerDidCancel?(self)
         } else {
@@ -41,7 +41,7 @@ import UIKit
         }
     }
 
-    public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+    open func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
             let cropController = WDImageCropViewController()
             cropController.set(image,
@@ -54,7 +54,7 @@ import UIKit
         
     }
 
-    func imageCropController(imageCropController: WDImageCropViewController, didFinishWithCroppedImage croppedImage: UIImage?) {
+    func imageCropController(_ imageCropController: WDImageCropViewController, didFinishWithCroppedImage croppedImage: UIImage?) {
         self.delegate?.imagePicker?(self, pickedImage: croppedImage)
     }
 }

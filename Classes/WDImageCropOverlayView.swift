@@ -15,20 +15,20 @@ internal class WDImageCropOverlayView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        backgroundColor = UIColor.clearColor()
-        userInteractionEnabled = true
+        backgroundColor = UIColor.clear
+        isUserInteractionEnabled = true
     }
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
 
-        backgroundColor = UIColor.clearColor()
-        userInteractionEnabled = true
+        backgroundColor = UIColor.clear
+        isUserInteractionEnabled = true
     }
 
-    override func drawRect(rect: CGRect) {
-        let width = CGRectGetWidth(frame)
-        let height = CGRectGetHeight(frame) - WDImagePicker.toolbarHeight
+    override func draw(_ rect: CGRect) {
+        let width = frame.width
+        let height = frame.height - WDImagePicker.toolbarHeight
 
         let heightSpan = floor(height / 2 - cropSize.height / 2)
         let widthSpan = floor(width / 2 - cropSize.width / 2)
@@ -39,11 +39,11 @@ internal class WDImageCropOverlayView: UIView {
 
         // fill inner border
         UIColor(red: 1, green: 1, blue: 1, alpha: 0.5).set()
-        UIRectFrame(CGRectMake(widthSpan - 2, heightSpan - 2, cropSize.width + 4,
-            cropSize.height + 4))
+        UIRectFrame(CGRect(x: widthSpan - 2, y: heightSpan - 2, width: cropSize.width + 4,
+            height: cropSize.height + 4))
 
         // fill inner rect
-        UIColor.clearColor().set()
-        UIRectFill(CGRectMake(widthSpan, heightSpan, cropSize.width, cropSize.height))
+        UIColor.clear.set()
+        UIRectFill(CGRect(x: widthSpan, y: heightSpan, width: cropSize.width, height: cropSize.height))
     }
 }
